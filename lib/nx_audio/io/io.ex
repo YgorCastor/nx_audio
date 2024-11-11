@@ -20,13 +20,32 @@ defmodule NxAudio.IO do
   """
   @type input_uri() :: binary() | Path.t()
 
-  @type load_errors() :: NxAudio.IO.Errors.FailedToExecuteBackend.t()
+  @typedoc """
+  Defines the possible errors that can occur when loading an audio file
+  """
+  @type io_errors() ::
+          NxAudio.IO.Errors.FailedToExecuteBackend.t()
+          | NxAudio.IO.Errors.InvalidMetadata.t()
 
   @doc """
   Loads an audio file from a given URI and returns a tuple with the audio tensor and the sample rate.
   """
-  @callback load(uri :: input_uri(), config :: NxAudio.IO.BackendConfig.t()) ::
-              {:ok, {audio_tensor(), sample_rate()}} | {:error, load_errors()}
+  @callback load(uri :: input_uri(), config :: NxAudio.IO.BackendReadConfig.t()) ::
+              {:ok, {audio_tensor(), sample_rate()}} | {:error, io_errors()}
 
-  @callback info(uri :: input_uri()) :: {:ok, NxAudio.IO.AudioMetadata.t()} | {:error, term()}
+  @doc """
+  Saves an audio tensor to a given URI.
+  """
+  @callback save(
+              uri :: input_uri(),
+              tensor :: audio_tensor(),
+              config :: NxAudio.IO.BackendSaveConfig.t()
+            ) ::
+              :ok | {:error, io_errors()}
+
+  @doc """
+  Returns the audio metadata for a given file.
+  """
+  @callback info(uri :: input_uri()) ::
+              {:ok, NxAudio.IO.AudioMetadata.t()} | {:error, io_errors()}
 end

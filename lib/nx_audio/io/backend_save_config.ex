@@ -1,37 +1,34 @@
-defmodule NxAudio.IO.BackendConfig do
+defmodule NxAudio.IO.BackendSaveConfig do
   @moduledoc """
-  Allowed configurations for audio backend implementations.
+  Defines how the backend should save the audio tensor.
   """
   @moduledoc section: :io
 
   @schema NimbleOptions.new!(
-            frame_offset: [
+            sample_rate: [
               type: :non_neg_integer,
-              default: 0,
-              doc: " Number of frames to skip before start reading data"
-            ],
-            num_frames: [
-              type: :integer,
-              default: -1,
-              doc: """
-              Maximum number of frames to read. -1 reads all the remaining samples, starting from frame_offset. 
-              This function may return the less number of frames if there is not enough frames in the given file
-              """
-            ],
-            normalize: [
-              type: :boolean,
-              default: true,
-              doc: """
-              When true, this function converts the native sample type to float32. Default: true.
-
-              If input file is integer WAV, giving False will change the resulting Tensor type to integer type. This argument has no effect for formats other than integer WAV type.
-              """
+              required: true,
+              doc: "Which sampling rate to use when writing the file"
             ],
             channels_first: [
               type: :boolean,
               default: true,
               doc: """
-              When True, the returned Tensor has dimension [channel, time]. Otherwise, the returned Tensor’s dimension is [time, channel].
+              If true, the given tensor is interpreted as [channel, time], otherwise [time, channel]
+              """
+            ],
+            format: [
+              type: {:in, [:wav, :flac, :ogg]},
+              doc: """
+              Override the audio format. When uri argument is path-like object, audio format is inferred from file extension. 
+              If the file extension is missing or different, you can specify the correct format with this argument.
+              When uri argument is file-like object, this argument is required.
+              """
+            ],
+            encoding: [
+              type: {:in, NxAudio.IO.Encoding.Type.enums()},
+              doc: """
+              Changes the encoding for supported formats. This argument is effective only for supported formats, i.e. "wav" and "flac"
               """
             ],
             buffer_size: [

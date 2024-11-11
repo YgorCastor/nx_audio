@@ -3,13 +3,13 @@ defmodule NxAudio.IO.Backends.FFmpegTest do
 
   alias NxAudio.IO.AudioMetadata
   alias NxAudio.IO.Backends.FFmpeg
-  alias NxAudio.IO.BackendConfig
+  alias NxAudio.IO.{BackendReadConfig, BackendSaveConfig}
 
   describe "load/2" do
     test "successfully loads an pcm_s16le encoded wav file" do
       uri = "test/fixtures/audio_samples/pcm_s16le.wav"
 
-      {:ok, backend_config} = BackendConfig.validate([])
+      {:ok, backend_config} = BackendReadConfig.validate([])
       {:ok, {tensor, sample_rate}} = FFmpeg.load(uri, backend_config)
 
       assert sample_rate == 44_100
@@ -21,7 +21,7 @@ defmodule NxAudio.IO.Backends.FFmpegTest do
     test "should be able to deal with a different file format" do
       uri = "test/fixtures/audio_samples/compressed.ogg"
 
-      {:ok, backend_config} = BackendConfig.validate([])
+      {:ok, backend_config} = BackendReadConfig.validate([])
       {:ok, {tensor, sample_rate}} = FFmpeg.load(uri, backend_config)
 
       assert sample_rate == 22_050
@@ -34,7 +34,7 @@ defmodule NxAudio.IO.Backends.FFmpegTest do
       uri = "test/fixtures/audio_samples/pcm_s16le.wav"
       frame_offset = 22_050
 
-      {:ok, backend_config} = BackendConfig.validate(frame_offset: frame_offset)
+      {:ok, backend_config} = BackendReadConfig.validate(frame_offset: frame_offset)
       {:ok, {tensor, _}} = FFmpeg.load(uri, backend_config)
 
       assert Nx.shape(tensor) == {2, 240_067}
@@ -43,7 +43,7 @@ defmodule NxAudio.IO.Backends.FFmpegTest do
     test "respects num_frames parameter" do
       uri = "test/fixtures/audio_samples/pcm_s16le.wav"
 
-      {:ok, backend_config} = BackendConfig.validate(num_frames: 11_025)
+      {:ok, backend_config} = BackendReadConfig.validate(num_frames: 11_025)
       {:ok, {tensor, _}} = FFmpeg.load(uri, backend_config)
 
       {channels, frames} = Nx.shape(tensor)
@@ -54,7 +54,7 @@ defmodule NxAudio.IO.Backends.FFmpegTest do
     test "handles channels_first option" do
       uri = "test/fixtures/audio_samples/pcm_s16le.wav"
 
-      {:ok, backend_config} = BackendConfig.validate(channels_first: false)
+      {:ok, backend_config} = BackendReadConfig.validate(channels_first: false)
       {:ok, {tensor, _sample_rate}} = FFmpeg.load(uri, backend_config)
 
       assert Nx.shape(tensor) == {262_117, 2}
@@ -63,7 +63,7 @@ defmodule NxAudio.IO.Backends.FFmpegTest do
     test "handles normalize option" do
       uri = "test/fixtures/audio_samples/pcm_s16le.wav"
 
-      {:ok, backend_config} = BackendConfig.validate(normalize: false)
+      {:ok, backend_config} = BackendReadConfig.validate(normalize: false)
       {:ok, {tensor, _sample_rate}} = FFmpeg.load(uri, backend_config)
 
       max_value = Nx.tensor(32_767)
@@ -73,6 +73,52 @@ defmodule NxAudio.IO.Backends.FFmpegTest do
     test "should handle file not found" do
       assert {:error, %NxAudio.IO.Errors.InvalidMetadata{reason: :no_such_file}} =
                FFmpeg.load("file_not_found", [])
+    end
+  end
+
+  describe "save/3" do
+    @describetag :tmp_dir
+
+    test "should be able to save a tensor to a wav file", %{tmp_dir: tmp_dir} do
+      uri = Path.join([tmp_dir, "sine_wave.wav"])
+
+      sample_rate = 22_050
+      tensor = new_tensor(sample_rate)
+
+      {:ok, backend_config} = BackendSaveConfig.validate(sample_rate: sample_rate)
+
+      assert :ok == FFmpeg.save(uri, tensor, backend_config)
+
+      assert {:ok,
+              %NxAudio.IO.AudioMetadata{
+                sample_rate: 22_050,
+                num_frames: 22_050,
+                num_channels: 1,
+                bits_per_sample: 16,
+                encoding: NxAudio.IO.Encoding.Type.PCM_S16
+              }} == FFmpeg.info(uri)
+    end
+
+    test "should be able to save the tensor to a different codec based on the file name", %{
+      tmp_dir: tmp_dir
+    } do
+      uri = Path.join([tmp_dir, "sine_wave.mp3"])
+
+      sample_rate = 22_050
+      tensor = new_tensor(sample_rate)
+
+      {:ok, backend_config} = BackendSaveConfig.validate(sample_rate: sample_rate)
+
+      assert :ok == FFmpeg.save(uri, tensor, backend_config)
+
+      assert {:ok,
+              %NxAudio.IO.AudioMetadata{
+                bits_per_sample: 0,
+                encoding: NxAudio.IO.Encoding.Type.MP3,
+                num_channels: 1,
+                num_frames: 15_114_240,
+                sample_rate: 22_050
+              }} == FFmpeg.info(uri)
     end
   end
 
@@ -284,5 +330,16 @@ defmodule NxAudio.IO.Backends.FFmpegTest do
               class: :invalid,
               reason: :no_such_file
             }} = FFmpeg.info(uri)
+  end
+
+  defp new_tensor(sample_rate) do
+    time = Nx.tensor(Enum.map(0..(sample_rate - 1), fn x -> x / sample_rate end))
+    frequency = 440.0
+
+    time
+    |> Nx.multiply(2 * :math.pi() * frequency)
+    |> Nx.sin()
+    |> Nx.multiply(32_767.0)
+    |> Nx.new_axis(-1)
   end
 end
