@@ -2,7 +2,7 @@ defmodule NxAudio.IO.Errors.InvalidBackendConfigurations do
   @moduledoc """
   Error when a invalid configuration is provided to a backend tool.
   """
-  @moduledoc section: [:io, :errors]
+  @moduledoc section: :io
   use Splode.Error, fields: [:message], class: :invalid
 
   @type t() :: Splode.Error.t()

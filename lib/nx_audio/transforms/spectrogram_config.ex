@@ -2,6 +2,8 @@ defmodule NxAudio.Transforms.SpectrogramConfig do
   @moduledoc """
   Configuration options for spectrogram transformation.
   """
+  @moduledoc section: :transforms
+
   @schema NimbleOptions.new!(
             n_fft: [
               type: :non_neg_integer,

@@ -3,7 +3,7 @@ defmodule NxAudio.IO.Backends.FFmpeg do
   Implements a FFMPEG backend to deal with audio files.
   This module requires FFMPEG to be installed on the system.
   """
-  @moduledoc section: [:io, :backends]
+  @moduledoc section: :io
   use FFmpex.Options
 
   import NxAudio.IO.Encoding

@@ -2,7 +2,7 @@ defmodule NxAudio.IO.Errors.FailedToBufferFile do
   @moduledoc """
   Error when writing the tensor to a temporary file
   """
-  @moduledoc section: [:io, :errors]
+  @moduledoc section: :io
   use Splode.Error, fields: [:reason], class: :io
 
   @type t() :: Splode.Error.t()

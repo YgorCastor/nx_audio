@@ -2,6 +2,7 @@ defmodule NxAudio.Commons.Errors.Unknown do
   @moduledoc """
   Errors that are unknown or unclassified
   """
+  @moduledoc section: :common_errors
   use Splode.ErrorClass, class: :unknown
 
   defmodule UnknownError do

@@ -2,6 +2,8 @@ defmodule NxAudio.Transforms.MelSpectrogramConfig do
   @moduledoc """
   Configuration options for mel spectrogram transformation.
   """
+  @moduledoc section: :transforms
+
   @schema NimbleOptions.new!(
             sample_rate: [
               type: :non_neg_integer,

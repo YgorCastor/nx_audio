@@ -2,7 +2,7 @@ defmodule NxAudio.IO.Errors.FailedToExecuteBackend do
   @moduledoc """
   Error raised when an audio file cannot be parsed using a backend tooling.
   """
-  @moduledoc section: [:io, :errors]
+  @moduledoc section: :io
   use Splode.Error, fields: [:backend, :reason], class: :io
 
   @type t() :: Splode.Error.t()

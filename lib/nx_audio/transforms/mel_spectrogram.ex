@@ -9,15 +9,15 @@ defmodule NxAudio.Transforms.MelSpectrogram do
   The mel scale relates perceived frequency to actual frequency in Hz. Two main formulas are supported:
 
   HTK (default):
-  $$ m = 2595 \log_{10}(1 + \frac{f}{700}) $$
+  $$m = 2595 \\log_{10}(1 + \\frac{f}{700}) $$
 
   Slaney:
-  $$ m = \begin{cases} 
-  f/f_{min} \cdot m_{min} & f < f_{min} \\
-  m_{min} + \log(f/f_{min})/\text{step} & f \geq f_{min}
-  \end{cases} $$
+  $$ m = \\begin{cases} 
+  f/f_{min} \\cdot m_{min} & f < f_{min} \\
+  m_{min} + \\log(f/f_{min})/\\text{step} & f \\geq f_{min}
+  \\end{cases} $$
 
-  where $f_{min}=1000$, $m_{min}=25$, $\text{step}=\log(6.4)/27$
+  where $f_{min}=1000$, $m_{min}=25$, $\\text{step}=\\log(6.4)/27$
 
   ## Filterbank Construction
 
@@ -28,12 +28,12 @@ defmodule NxAudio.Transforms.MelSpectrogram do
   3. Convert back to Hz to get filterbank center frequencies
   4. Create triangular filters:
 
-  $$ H_m(k) = \begin{cases}
+  $$ H_m(k) = \\begin{cases}
   0 & k < f(m-1) \\
-  \frac{k - f(m-1)}{f(m) - f(m-1)} & f(m-1) \leq k < f(m) \\
-  \frac{f(m+1) - k}{f(m+1) - f(m)} & f(m) \leq k < f(m+1) \\
-  0 & k \geq f(m+1)
-  \end{cases} $$
+  \\frac{k - f(m-1)}{f(m) - f(m-1)} & f(m-1) \\leq k < f(m) \\
+  \\frac{f(m+1) - k}{f(m+1) - f(m)} & f(m) \\leq k < f(m+1) \\
+  0 & k \\geq f(m+1)
+  \\end{cases} $$
 
   where $f(m)$ is the frequency of filterbank $m$.
 
@@ -48,6 +48,7 @@ defmodule NxAudio.Transforms.MelSpectrogram do
 
   By mapping frequencies to a perceptual scale and reducing dimensionality, mel spectrograms provide an efficient and meaningful audio representation.
   """
+  @moduledoc section: :transforms
 
   import Nx.Defn
   import NxAudio.Transforms.MelSpectrogramConfig
@@ -122,39 +123,41 @@ defmodule NxAudio.Transforms.MelSpectrogram do
     end
   end
 
-  @min_log_hz 1000.0
-  @min_log_mel @min_log_hz / 40.0
-  @mel_step Nx.log(6.4) / 27.0
-  @htk_mul 1127.0
-  @frequency_ref 700.0
-
   defnp hz_to_mel(freq, opts) do
     case opts[:mel_scale] do
       :htk ->
-        @htk_mul * Nx.log(1.0 + freq / @frequency_ref)
+        1127.0 * Nx.log(1.0 + freq / 700.0)
 
       _ ->
+        min_log_hz = 1000.0
+        min_log_mel = min_log_hz / 40.0
+        logstep = Nx.log(6.4) / 27.0
+
         freq =
           Nx.select(
-            freq > @min_log_hz,
-            @min_log_mel + Nx.log(freq / @min_log_hz) / @mel_step,
-            freq / @min_log_hz * @min_log_mel
+            freq > min_log_hz,
+            min_log_mel + Nx.log(freq / min_log_hz) / logstep,
+            freq / min_log_hz * min_log_mel
           )
 
-        @min_log_mel + Nx.log(1 + freq / @frequency_ref) * @htk_mul
+        min_log_mel + Nx.log(1 + freq / 700) * 1127.01048
     end
   end
 
   defnp mel_to_hz(mel, opts) do
     case opts[:mel_scale] do
       :htk ->
-        @frequency_ref * (Nx.exp(mel / @htk_mul) - 1.0)
+        700.0 * (Nx.exp(mel / 1127.0) - 1.0)
 
       _ ->
+        min_log_hz = 1000.0
+        min_log_mel = min_log_hz / 40.0
+        logstep = Nx.log(6.4) / 27.0
+
         Nx.select(
-          mel > @min_log_mel,
-          @min_log_hz * Nx.exp(@mel_step * (mel - @min_log_mel)),
-          @min_log_hz * mel / @min_log_mel
+          mel > min_log_mel,
+          min_log_hz * Nx.exp(logstep * (mel - min_log_mel)),
+          min_log_hz * mel / min_log_mel
         )
     end
   end
