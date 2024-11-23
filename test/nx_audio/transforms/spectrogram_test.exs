@@ -24,10 +24,10 @@ defmodule NxAudio.Transforms.SpectrogramTest do
     # expected_bin ≈ 440 * 400 / 22050 ≈ 8
     expected_bin = floor(440 * 400 / 22_050)
 
-    # Get the average magnitude across all frames
+    # Get the average magnitude across all frames and channels
     mean_spectrum =
       spec
-      |> Nx.mean(axes: [0])
+      |> Nx.mean(axes: [0, 1])
       |> Nx.to_flat_list()
 
     # Find the bin with maximum energy

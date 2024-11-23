@@ -16,6 +16,9 @@ defmodule NxAudio.Transforms.Spectrogram do
   Returns:  
     If input is [samples]: Returns tensor of shape [time, frequency]  
     If input is [channels, samples]: Returns tensor of shape [channels, time, frequency]  
+
+  Note:
+    Expected input format is {channels, time} for multi-channel audio
   """
   @moduledoc section: :transforms
 
@@ -90,14 +93,19 @@ defmodule NxAudio.Transforms.Spectrogram do
     {_n_channels, n_samples} = Nx.shape(input)
     n_frames = div(n_samples - frame_length, hop_length) + 1
 
-    # Create frame indices more efficiently
+    # Create frame indices for each channel
     indices =
       Nx.iota({frame_length})
       |> Nx.add(Nx.multiply(Nx.reshape(Nx.iota({n_frames}), {n_frames, 1}), hop_length))
+      |> Nx.new_axis(0)
 
-    # Reshape input for gather operation
-    frames = Nx.take(input, indices)
-    Nx.transpose(frames, axes: [0, 2, 1])
+    # Gather frames for each channel
+    {n_channels, _} = Nx.shape(input)
+
+    input
+    |> Nx.new_axis(1)
+    |> Nx.broadcast({n_channels, n_frames, n_samples})
+    |> Nx.take_along_axis(indices, axis: 2)
   end
 
   defnp apply_window(frames, window) do

@@ -23,7 +23,8 @@ defmodule NxAudio.MixProject do
         extras: [
           "CHANGELOG.md": [title: "Changelog"],
           "README.md": [title: "Introduction"],
-          LICENSE: [title: "License"]
+          LICENSE: [title: "License"],
+          "./livemd/visualizations.livemd": [title: "Spectrogram Visualizations"]
         ],
         before_closing_head_tag: &before_closing_head_tag/1,
         groups_for_modules: [
@@ -64,7 +65,8 @@ defmodule NxAudio.MixProject do
       {:mix_audit, ">= 0.0.0", only: [:dev, :test], runtime: false},
       {:nimble_options, "~> 1.1"},
       {:nx, "~> 0.9"},
-      {:splode, "~> 0.2"}
+      {:splode, "~> 0.2"},
+      {:vega_lite, "~> 0.1", optional: true}
     ]
   end
 
