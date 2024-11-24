@@ -7,7 +7,13 @@ defmodule NxAudio.Transforms.MelSpectrogramTest do
 
   test "should compute mel spectrogram correctly" do
     audio_tensor = new_pcm_with_sr(22_050)
-    mel_spec = MelSpectrogram.transform(audio_tensor, sample_rate: 22_050, n_mels: 128)
+
+    mel_spec =
+      MelSpectrogram.transform(audio_tensor,
+        sample_rate: 22_050,
+        n_mels: 128,
+        mel_scale: :htk
+      )
 
     {channels, n_frames, n_mels} = Nx.shape(mel_spec)
 
@@ -18,14 +24,25 @@ defmodule NxAudio.Transforms.MelSpectrogramTest do
 
     # Test mel scaling - 440Hz tone should activate specific mel bins
     # Convert 440Hz to mel scale (HTK)
-    mel_440 = 2595 * :math.log10(1 + 440 / 700)
-    # Find corresponding mel bin
-    mel_step = 2595 * :math.log10(1 + 22050 / 2 / 700) / 128
-    expected_bin = floor(mel_440 / mel_step)
+    mel_440 = 1127.0 * :math.log(1 + 440 / 700)
+
+    # Calculate mel_min and mel_max
+    f_min = 0
+    # 11,025 Hz
+    f_max = 22_050 / 2
+
+    mel_min = 1127.0 * :math.log(1 + f_min / 700)
+    mel_max = 1127.0 * :math.log(1 + f_max / 700)
+
+    # Correct mel_step calculation
+    mel_step = (mel_max - mel_min) / (128 + 1)
+
+    # Compute expected bin index
+    expected_bin = floor((mel_440 - mel_min) / mel_step)
 
     mean_mel_spectrum =
       mel_spec
-      |> Nx.mean(axes: [0])
+      |> Nx.mean(axes: [1])
       |> Nx.to_flat_list()
 
     {_max_val, max_idx} =
