@@ -1,0 +1,44 @@
+on:
+  push:
+    branches:
+      - master
+
+permissions:
+  contents: write
+  pull-requests: write
+
+name: Release Flow
+
+jobs:
+  release-please:
+    strategy:
+      matrix:
+        elixir: ["1.17.3"]
+        otp: ["27.2"]
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Prepare Release"
+        uses: googleapis/release-please-action@v4
+        with:
+          release-type: elixir
+
+      - name: Set up Elixir
+        uses: erlef/setup-beam@v1
+        if: ${{ steps.release.outputs.release_created }}
+        with:
+          elixir-version: ${{ matrix.elixir }}
+          otp-version: ${{ matrix.otp }}
+
+      - name: Checkout
+        uses: actions/checkout@v4
+        if: ${{ steps.release.outputs.release_created }}
+
+      - name: Fetch and Compile Dependencies
+        if: ${{ steps.release.outputs.release_created }}
+        run: |
+          mix deps.get
+          mix deps.compile
+
+      - name: Publish to hex.pm
+        if: ${{ steps.release.outputs.release_created }}
+        run: HEX_API_KEY=${{ secrets.HEX_API_KEY }} mix hex.publish --yes
