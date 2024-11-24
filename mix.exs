@@ -21,10 +21,10 @@ defmodule NxAudio.MixProject do
       docs: [
         main: "readme",
         extras: [
-          "CHANGELOG.md": [title: "Changelog"],
           "README.md": [title: "Introduction"],
-          LICENSE: [title: "License"],
-          "./livemd/visualizations.livemd": [title: "Spectrogram Visualizations"]
+          "CHANGELOG.md": [title: "Changelog"],
+          "./livemd/visualizations.livemd": [title: "Spectrogram Visualizations"],
+          LICENSE: [title: "License"]
         ],
         before_closing_head_tag: &before_closing_head_tag/1,
         groups_for_modules: [
@@ -32,11 +32,13 @@ defmodule NxAudio.MixProject do
           "Common Utilities": &(&1[:section] == :common_utils),
           IO: &(&1[:section] == :io),
           Transformations: &(&1[:section] == :transforms),
+          Visualizations: &(&1[:section] == :visualizations),
           Codecs: &(&1[:section] == :encodings)
         ],
         nest_modules_by_prefix: [
           NxAudio.Commons.Errors,
           NxAudio.Transforms,
+          NxAudio.Visualizations,
           NxAudio.IO.Encoding.Type,
           NxAudio.IO.Backends,
           NxAudio.IO.Errors

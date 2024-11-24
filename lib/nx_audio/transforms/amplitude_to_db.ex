@@ -2,12 +2,13 @@ defmodule NxAudio.Transforms.AmplitudeToDb do
   @moduledoc """
   Represents the amplitude to decibel transformation for audio signals.
   """
+  @moduledoc section: :transforms
   import Nx.Defn
 
   @doc """
   Returns the decibel representation of a power or magnitude spectrogram.
   """
-  @spec transform(Nx.tensor(), keyword()) :: Nx.tensor()
+  @spec transform(Nx.Tensor.t(), keyword()) :: Nx.Tensor.t()
   defn transform(spectrogram, opts \\ []) do
     opts = keyword!(opts, top_db: 80.0, scale: :power)
 
