@@ -1,4 +1,4 @@
-defmodule NxAudio.IO.BackendConfigTest do
+defmodule NxAudio.IO.BackendReadConfigTest do
   use ExUnit.Case, async: true
 
   test "an empty config should return default values" do
@@ -9,12 +9,12 @@ defmodule NxAudio.IO.BackendConfigTest do
               normalize: true,
               num_frames: -1,
               frame_offset: 0
-            ]} = NxAudio.IO.BackendConfig.validate([])
+            ]} = NxAudio.IO.BackendReadConfig.validate([])
   end
 
   test "should return an error when a invalid value is informed" do
     assert {:error, %NxAudio.IO.Errors.InvalidBackendConfigurations{message: message}} =
-             NxAudio.IO.BackendConfig.validate(
+             NxAudio.IO.BackendReadConfig.validate(
                buffer_size: -1,
                channels_first: 1,
                num_frames: 1.1
