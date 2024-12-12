@@ -18,7 +18,7 @@ defmodule NxAudio.IO do
   @typedoc """
   Defines the input for the load function, which can be a binary audio or a valid file path
   """
-  @type input_uri() :: binary() | Path.t()
+  @type file_uri() :: binary() | Path.t()
 
   @typedoc """
   Defines the possible errors that can occur when loading an audio file
@@ -30,14 +30,14 @@ defmodule NxAudio.IO do
   @doc """
   Loads an audio file from a given URI and returns a tuple with the audio tensor and the sample rate.
   """
-  @callback load(uri :: input_uri(), config :: NxAudio.IO.BackendReadConfig.t()) ::
+  @callback load(uri :: file_uri(), config :: NxAudio.IO.BackendReadConfig.t()) ::
               {:ok, {audio_tensor(), sample_rate()}} | {:error, io_errors()}
 
   @doc """
   Saves an audio tensor to a given URI.
   """
   @callback save(
-              uri :: input_uri(),
+              uri :: file_uri(),
               tensor :: audio_tensor(),
               config :: NxAudio.IO.BackendSaveConfig.t()
             ) ::
@@ -46,6 +46,6 @@ defmodule NxAudio.IO do
   @doc """
   Returns the audio metadata for a given file.
   """
-  @callback info(uri :: input_uri()) ::
+  @callback info(uri :: file_uri()) ::
               {:ok, NxAudio.IO.AudioMetadata.t()} | {:error, io_errors()}
 end
