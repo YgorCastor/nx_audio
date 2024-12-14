@@ -5,7 +5,6 @@ defmodule NxAudio.Transforms.SpectrogramTest do
 
   alias NxAudio.Transforms.Spectrogram
 
-  @tag timeout: 600_000
   test "should be able to compute a spectrogram correctly" do
     audio_tensor = new_pcm_with_sr(22_050)
 
@@ -16,7 +15,7 @@ defmodule NxAudio.Transforms.SpectrogramTest do
     # Test 1: Verify output shape
     assert n_freqs == div(400, 2) + 1
     assert n_frames > 0
-    assert channels == 2
+    assert channels == 1
 
     # Test 2: Find peak frequency bin
 

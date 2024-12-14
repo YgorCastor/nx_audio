@@ -1,8 +1,13 @@
-defmodule NxAudio.Transforms.SpectrogramConfig do
+defmodule NxAudio.Transforms.MelSpectrogramConfig do
   @moduledoc """
-  Configuration options for spectrogram transformation.
+  Configuration options for mel spectrogram transformation.
   """
   @schema NimbleOptions.new!(
+            sample_rate: [
+              type: :non_neg_integer,
+              default: 16_000,
+              doc: "Sample rate of audio signal."
+            ],
             n_fft: [
               type: :non_neg_integer,
               default: 400,
@@ -10,18 +15,33 @@ defmodule NxAudio.Transforms.SpectrogramConfig do
             ],
             win_length: [
               type: :non_neg_integer,
-              doc: "Number of samples in each frame. By default its half of the n_fft"
+              doc: "Number of samples in each frame. By default its n_fft."
             ],
             hop_length: [
               type: :non_neg_integer,
               doc: """
-              Number of samples between successive frames., By default its half of the n_fft
+              Number of samples between successive frames. By default its win_length/2.
               """
+            ],
+            f_min: [
+              type: :float,
+              default: 0.0,
+              doc: "Minimum frequency."
+            ],
+            f_max: [
+              type: :float,
+              default: nil,
+              doc: "Maximum frequency."
             ],
             pad: [
               type: :non_neg_integer,
               default: 0,
               doc: "Two sided padding of signal."
+            ],
+            n_mels: [
+              type: :non_neg_integer,
+              default: 128,
+              doc: "Number of mel filterbanks."
             ],
             window_fn: [
               default: &NxAudio.Commons.Windows.haan/1,
@@ -65,6 +85,19 @@ defmodule NxAudio.Transforms.SpectrogramConfig do
               doc: """
               Controls whether to return half of results to avoid redundancy.
               """
+            ],
+            norm: [
+              type: {:in, [:slaney]},
+              doc: """
+              If “slaney”, divide the triangular mel weights by the width of the mel band (area normalization).
+              """
+            ],
+            mel_scale: [
+              type: {:in, [:htk, :slaney]},
+              default: :htk,
+              doc: """
+              Scale to use
+              """
             ]
           )
 
@@ -76,38 +109,28 @@ defmodule NxAudio.Transforms.SpectrogramConfig do
   @type t() :: [unquote(NimbleOptions.option_typespec(@schema))]
 
   @doc """
-  Parses and validate a keyword list into a valid spectrogram config
+  Parses and validate a keyword list into a valid mel spectrogram config
   """
   defn validate(config) do
     config
     |> keyword!(
+      sample_rate: 16_000,
       n_fft: 400,
       win_length: -1,
       hop_length: -1,
+      f_min: 0.0,
+      f_max: -1,
       pad: 0,
+      n_mels: 128,
       window_fn: &NxAudio.Commons.Windows.haan/1,
       power: 2.0,
       normalized: nil,
       wkwargs: [],
       center: true,
       pad_mode: :reflect,
-      onesided: true
+      onesided: true,
+      norm: nil,
+      mel_scale: :htk
     )
-  end
-
-  defn maybe_calculate_win_length(win_length, n_fft) do
-    if win_length != -1 do
-      win_length
-    else
-      n_fft
-    end
-  end
-
-  defn maybe_calculate_hop_length(hop_length, win_length) do
-    if hop_length != -1 do
-      hop_length
-    else
-      div(win_length, 2)
-    end
   end
 end

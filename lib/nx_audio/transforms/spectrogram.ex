@@ -24,8 +24,8 @@ defmodule NxAudio.Transforms.Spectrogram do
     original_rank = Nx.rank(audio_tensor)
 
     audio_tensor = maybe_add_channel_dim(audio_tensor)
-    win_length = maybe_calculate_length(opts, :win_length)
-    hop_length = maybe_calculate_length(opts, :hop_length)
+    win_length = maybe_calculate_win_length(opts[:win_length], opts[:n_fft])
+    hop_length = maybe_calculate_hop_length(opts[:hop_length], win_length)
     window = opts[:window_fn].(window_length: win_length, periodic: true)
 
     result =
