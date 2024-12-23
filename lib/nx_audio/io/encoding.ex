@@ -2,10 +2,13 @@ defmodule NxAudio.IO.Encoding do
   @moduledoc """
   Represents the supported audio encodings
   """
-  @moduledoc section: :io
   use EnumType
 
   defenum Type do
+    @moduledoc """
+    Codec Names
+    """
+    @moduledoc section: :encodings
     value PCM_S16, "PCM_S16" do
       def codec_names(), do: ["pcm_s16le"]
     end

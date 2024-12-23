@@ -17,6 +17,8 @@ defmodule NxAudio.Transforms.Spectrogram do
     If input is [samples]: Returns tensor of shape [time, frequency]  
     If input is [channels, samples]: Returns tensor of shape [channels, time, frequency]  
   """
+  @moduledoc section: :transforms
+
   defn transform(audio_tensor, opts \\ []) do
     opts = validate(opts)
 

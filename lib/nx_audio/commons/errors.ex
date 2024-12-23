@@ -1,8 +1,5 @@
 defmodule NxAudio.Commons.Errors do
-  @moduledoc """
-  Defines the error classes for the NxAudio framework.
-  """
-  @moduledoc section: [:commons, :errors]
+  @moduledoc false
   use Splode,
     error_classes: [
       invalid: NxAudio.Commons.Errors.Invalid,

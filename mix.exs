@@ -25,13 +25,20 @@ defmodule NxAudio.MixProject do
           "README.md": [title: "Introduction"],
           LICENSE: [title: "License"]
         ],
+        before_closing_head_tag: &before_closing_head_tag/1,
         groups_for_modules: [
-          Common: &(&1[:section] == :commons),
-          IO: &(&1[:section] == :io)
+          "Error Types": &(&1[:section] == :common_errors),
+          "Common Utilities": &(&1[:section] == :common_utils),
+          IO: &(&1[:section] == :io),
+          Transformations: &(&1[:section] == :transforms),
+          Codecs: &(&1[:section] == :encodings)
         ],
         nest_modules_by_prefix: [
-          NxAudio.Commons,
-          NxAudio.IO
+          NxAudio.Commons.Errors,
+          NxAudio.Transforms,
+          NxAudio.IO.Encoding.Type,
+          NxAudio.IO.Backends,
+          NxAudio.IO.Errors
         ]
       ]
     ]
@@ -86,5 +93,23 @@ defmodule NxAudio.MixProject do
       links: %{"GitHub" => "https://github.com/YgorCastor/nx_audio.git"},
       sponsor: "ycastor.eth"
     ]
+  end
+
+  defp before_closing_head_tag(_opts) do
+    """
+      <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/katex.min.css" integrity="sha384-vKruj+a13U8yHIkAyGgK1J3ArTLzrFGBbBc0tDp4ad/EyewESeXE/Iv67Aj8gKZ0" crossorigin="anonymous">
+      <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/katex.min.js" integrity="sha384-PwRUT/YqbnEjkZO0zZxNqcxACrXe+j766U2amXcgMg5457rve2Y7I6ZJSm2A0mS4" crossorigin="anonymous"></script>
+
+      <link href="https://cdn.jsdelivr.net/npm/katex-copytex@1.0.2/dist/katex-copytex.min.css" rel="stylesheet" type="text/css">
+      <script defer src="https://cdn.jsdelivr.net/npm/katex-copytex@1.0.2/dist/katex-copytex.min.js" crossorigin="anonymous"></script>
+
+      <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/contrib/auto-render.min.js" integrity="sha384-+VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4+/RRE05" crossorigin="anonymous"
+        onload="renderMathInElement(document.body, {
+          delimiters: [
+            {left: '$$', right: '$$', display: true},
+            {left: '$', right: '$', display: false},
+          ]
+        });"></script>
+    """
   end
 end

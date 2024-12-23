@@ -2,7 +2,7 @@ defmodule NxAudio.IO.Backends.FFmpegWriter do
   @moduledoc """
   Writing operations using the FFmpeg backend
   """
-  @moduledoc section: [:io, :backends]
+  @moduledoc section: :io
   use FFmpex.Options
 
   import FFmpex

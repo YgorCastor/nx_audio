@@ -2,6 +2,7 @@ defmodule NxAudio.Commons.Windows do
   @moduledoc """
   NX Implementation of common window functions.
   """
+  @moduledoc section: :common_utils
   import Nx.Defn
 
   @pi 3.141592653589793

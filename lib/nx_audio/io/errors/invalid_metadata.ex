@@ -2,7 +2,7 @@ defmodule NxAudio.IO.Errors.InvalidMetadata do
   @moduledoc """
   Error when an invalid metadata is returned by a backend tool.
   """
-  @moduledoc section: [:io, :errors]
+  @moduledoc section: :io
   use Splode.Error, fields: [:reason], class: :invalid
 
   @type t() :: Splode.Error.t()
