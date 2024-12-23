@@ -11,5 +11,6 @@ defmodule NxAudio.Fixtures.AudioTensors do
     |> Nx.sin()
     |> Nx.multiply(32_767.0)
     |> Nx.new_axis(-1)
+    |> Nx.transpose()
   end
 end
