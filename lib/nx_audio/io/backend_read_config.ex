@@ -41,7 +41,11 @@ defmodule NxAudio.IO.BackendReadConfig do
               Size of buffer to use when processing file-like objects, in bytes.
               """
             ],
-            backend: [type: :atom]
+            backend: [
+              type: {:in, [:ffmpeg]},
+              default: :ffmpeg,
+              doc: "Backend to use for reading audio files"
+            ]
           )
 
   alias NxAudio.IO.Errors

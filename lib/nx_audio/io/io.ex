@@ -4,6 +4,8 @@ defmodule NxAudio.IO do
   """
   @moduledoc section: :io
 
+  alias NxAudio.IO.{BackendReadConfig, BackendSaveConfig}
+
   @typedoc """
   Audio sample rate in Hz
   """
@@ -48,4 +50,34 @@ defmodule NxAudio.IO do
   """
   @callback info(uri :: file_uri()) ::
               {:ok, NxAudio.IO.AudioMetadata.t()} | {:error, io_errors()}
+
+  @doc false
+  def load(uri, config) do
+    with {:ok, config} <- BackendReadConfig.validate(config),
+         module <- which_backend(config) do
+      module.load(uri, config)
+    end
+  end
+
+  @doc false
+  def save(uri, tensor, config) do
+    with {:ok, config} <- BackendSaveConfig.validate(config),
+         module <- which_backend(config) do
+      module.save(uri, tensor, config)
+    end
+  end
+
+  @doc false
+  def info(uri, config) do
+    with {:ok, config} <- BackendReadConfig.validate(config),
+         module <- which_backend(config) do
+      module.info(uri)
+    end
+  end
+
+  defp which_backend(config) do
+    case config[:backend] do
+      :ffmpeg -> NxAudio.IO.Backends.FFmpeg
+    end
+  end
 end
