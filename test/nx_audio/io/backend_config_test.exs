@@ -4,11 +4,12 @@ defmodule NxAudio.IO.BackendReadConfigTest do
   test "an empty config should return default values" do
     assert {:ok,
             [
-              buffer_size: 4096,
-              channels_first: true,
-              normalize: true,
-              num_frames: -1,
-              frame_offset: 0
+              {:backend, :ffmpeg},
+              {:buffer_size, 4096},
+              {:channels_first, true},
+              {:normalize, true},
+              {:num_frames, -1},
+              {:frame_offset, 0}
             ]} = NxAudio.IO.BackendReadConfig.validate([])
   end
 
