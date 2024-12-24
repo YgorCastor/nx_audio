@@ -7,6 +7,8 @@ but built for the Nx ecosystem.
 
 * Audio I/O operations with support for multiple formats
 * Audio transformations and processing
+  * Amplitude to DB
+  * MEL Spectrogram and STFT
 * Spectrogram visualizations
 * Multiple codec support including:
   * PCM formats (S16, S24, S32, S8, U8, F32, F64)
@@ -43,13 +45,10 @@ Basic audio operations:
 
 ```elixir
 # Reading an audio file
-{:ok, tensor, sample_rate} = NxAudio.IO.load("path/to/audio.mp3")
-
-# Processing audio with transformations
-transformed = NxAudio.Transforms.apply_window(tensor, :hann)
+{:ok, {tensor, sample_rate}} = NxAudio.IO.load("path/to/audio.mp3")
 
 # Generating spectrograms
-spectrogram = NxAudio.Transforms.spectrogram(tensor, sample_rate: sample_rate)
+spectrogram = NxAudio.Transforms.Spectrogram.transform(tensor, sample_rate: sample_rate)
 ```
 
 ## Documentation
