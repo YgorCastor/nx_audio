@@ -58,6 +58,9 @@ defmodule NxAudio.Visualizations.SpectrogramConfig do
   """
   @type t() :: [unquote(NimbleOptions.option_typespec(@schema))]
 
+  @doc """
+  Validates the given configuration options and returns the parsed configuration.
+  """
   @spec validate!(backend_options :: Keyword.t()) :: t()
   def validate!(config) do
     case NimbleOptions.validate(config, @schema) do

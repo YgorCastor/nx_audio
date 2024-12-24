@@ -17,7 +17,8 @@
     NxAudio.IO.Encoding.Type.ULAW,
     NxAudio.IO.Encoding.Type.VORBIS,
     NxAudio.IO.Encoding.Type.HTK,
-    NxAudio.IO.Encoding.Type.UNKNOWN
+    NxAudio.IO.Encoding.Type.UNKNOWN,
+    NxAudio.Visualizations.Spectrogram
   ],
   ignore_paths: [
     ~r|test/.*|

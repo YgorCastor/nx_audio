@@ -160,6 +160,7 @@ else
   defmodule NxAudio.Visualizations.Spectrogram do
     @moduledoc false
 
+    @doc false
     def plot(_spectrogram, _opts \\ []) do
       raise "VegaLite is required to use this module. Add `{:vega_lite, \"~> 0.1\"}` to your dependencies."
     end
