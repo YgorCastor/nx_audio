@@ -1,5 +1,4 @@
 defmodule NxAudio do
-  @moduledoc """
-  NxAudio is a library for working with audio tensors
-  """
+  @external_resource "README.md"
+  @moduledoc File.read!("README.md")
 end
