@@ -1,6 +1,8 @@
 defmodule NxAudio.MixProject do
   use Mix.Project
 
+  @source_url "https://github.com/YgorCastor/nx_audio"
+
   def project do
     [
       app: :nx_audio,
@@ -16,8 +18,8 @@ defmodule NxAudio.MixProject do
       dialyzer: [
         plt_core_path: "_plts/core"
       ],
-      source_url: "https://github.com/YgorCastor/nx_audio.git",
-      homepage_url: "https://github.com/YgorCastor/nx_audio.git",
+      source_url: @source_url,
+      homepage_url: @source_url,
       docs: [
         main: "readme",
         extras: [
