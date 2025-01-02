@@ -11,7 +11,7 @@ jobs:
   build:
     strategy:
       matrix:
-        elixir: ["1.17.3"]
+        elixir: ["1.18.1"]
         otp: ["27.2"]
 
     name: Build and test
