@@ -14,7 +14,7 @@ defmodule NxAudio.IO.Backends.FFmpegTest do
 
       assert sample_rate == 44_100
 
-      assert Nx.shape(tensor) == {2, 262_117}
+      assert Nx.shape(tensor) == {2, 262_094}
       assert Nx.type(tensor) == {:f, 32}
     end
 
@@ -26,7 +26,7 @@ defmodule NxAudio.IO.Backends.FFmpegTest do
 
       assert sample_rate == 22_050
 
-      assert Nx.shape(tensor) == {1, 65_543}
+      assert Nx.shape(tensor) == {1, 65_520}
       assert Nx.type(tensor) == {:f, 32}
     end
 
@@ -37,7 +37,7 @@ defmodule NxAudio.IO.Backends.FFmpegTest do
       {:ok, backend_config} = BackendReadConfig.validate(frame_offset: frame_offset)
       {:ok, {tensor, _}} = FFmpeg.load(uri, backend_config)
 
-      assert Nx.shape(tensor) == {2, 240_067}
+      assert Nx.shape(tensor) == {2, 240_044}
     end
 
     test "respects num_frames parameter" do
@@ -57,7 +57,7 @@ defmodule NxAudio.IO.Backends.FFmpegTest do
       {:ok, backend_config} = BackendReadConfig.validate(channels_first: false)
       {:ok, {tensor, _sample_rate}} = FFmpeg.load(uri, backend_config)
 
-      assert Nx.shape(tensor) == {262_117, 2}
+      assert Nx.shape(tensor) == {262_094, 2}
     end
 
     test "handles normalize option" do
@@ -73,6 +73,38 @@ defmodule NxAudio.IO.Backends.FFmpegTest do
     test "should handle file not found" do
       assert {:error, %NxAudio.IO.Errors.InvalidMetadata{reason: :no_such_file}} =
                FFmpeg.load("file_not_found", [])
+    end
+  end
+
+  describe "stream!/2" do
+    test "should be able to stream a file" do
+      uri = "test/fixtures/audio_samples/pcm_s16le.wav"
+
+      {:ok, backend_config} = BackendReadConfig.validate([])
+
+      stream = FFmpeg.stream!(uri, backend_config)
+
+      assert [tensor_1, tensor_2] = Stream.take(stream, 2) |> Enum.to_list()
+
+      assert Nx.shape(tensor_1) == {2, 4096}
+      assert Nx.shape(tensor_2) == {2, 4096}
+
+      assert tensor_1 != tensor_2
+    end
+
+    test "should deal with eof correctly" do
+      uri = "test/fixtures/audio_samples/pcm_s16le.wav"
+
+      {:ok, backend_config} = BackendReadConfig.validate([])
+
+      stream = FFmpeg.stream!(uri, backend_config)
+      tensor_list = Enum.to_list(stream)
+      tensor = Nx.concatenate(tensor_list, axis: 1)
+
+      assert length(tensor_list) == 64
+
+      assert Nx.shape(tensor) == {2, 262_144}
+      assert Nx.type(tensor) == {:f, 32}
     end
   end
 
