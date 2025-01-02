@@ -10,6 +10,8 @@ defmodule NxAudio.IO.Backends.FFmpegReader do
 
   alias NxAudio.IO.Errors.FailedToExecuteBackend
 
+  @riff_header_size 92
+
   @doc false
   def load(uri, opts) do
     with {:ok, audio_metadata} <- NxAudio.IO.Backends.FFmpeg.info(uri),
@@ -21,6 +23,40 @@ defmodule NxAudio.IO.Backends.FFmpegReader do
            ),
          tensor <- to_tensor(raw_data, audio_metadata, opts) do
       {:ok, {tensor, audio_metadata.sample_rate}}
+    end
+  end
+
+  @doc false
+  def stream!(uri, opts) do
+    {:ok, audio_metadata} = NxAudio.IO.Backends.FFmpeg.info(uri)
+
+    Stream.resource(
+      fn -> 0 end,
+      fn curr_frame -> do_stream(curr_frame, uri, audio_metadata, opts) end,
+      fn _ -> :ok end
+    )
+  end
+
+  defp do_stream(curr_frame, uri, metadata, opts) do
+    opts =
+      opts
+      |> Keyword.put(:frame_offset, curr_frame)
+      |> Keyword.put(:num_frames, opts[:buffer_size])
+
+    encode_audio(uri, metadata, opts)
+    |> parse_stream_result(curr_frame, metadata, opts)
+  end
+
+  defp parse_stream_result({:ok, raw_data}, curr_frame, metadata, opts) do
+    if byte_size(raw_data) == 0 do
+      {:halt, curr_frame}
+    else
+      bytes_per_sample = bytes_per_sample(get_type(metadata.encoding))
+      expected_bytes = bytes_per_sample * metadata.num_channels * opts[:buffer_size]
+      actual_bytes = byte_size(raw_data)
+      padded_data = raw_data <> :binary.copy(<<0>>, expected_bytes - actual_bytes)
+
+      {[to_tensor(padded_data, metadata, opts)], curr_frame + opts[:buffer_size]}
     end
   end
 
@@ -43,7 +79,7 @@ defmodule NxAudio.IO.Backends.FFmpegReader do
 
     case result do
       {:ok, raw_data} ->
-        {:ok, raw_data}
+        {:ok, skip_riff(raw_data)}
 
       {:error, error} ->
         {:error, FailedToExecuteBackend.exception(backend: :ffmpeg, reason: error)}
@@ -102,6 +138,9 @@ defmodule NxAudio.IO.Backends.FFmpegReader do
 
     if opts[:channels_first], do: Nx.transpose(tensor), else: tensor
   end
+
+  defp skip_riff(binary),
+    do: :binary.part(binary, @riff_header_size, byte_size(binary) - @riff_header_size)
 
   defp get_max_value({:s, 8}), do: 128
   defp get_max_value({:s, 16}), do: 32_768

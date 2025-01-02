@@ -17,6 +17,9 @@ defmodule NxAudio.IO.Backends.FFmpeg do
   defdelegate load(uri, opts), to: NxAudio.IO.Backends.FFmpegReader
 
   @impl true
+  defdelegate stream!(uri, opts), to: NxAudio.IO.Backends.FFmpegReader
+
+  @impl true
   defdelegate save(uri, tensor, config), to: NxAudio.IO.Backends.FFmpegWriter
 
   @impl true
