@@ -77,7 +77,7 @@ defmodule NxAudio.IO do
 
   @doc """
   Streams an audio file from the given URI using the configured backend.
-  
+
   This function returns an enumerable that can be used to process the audio data in chunks,
   which is useful for handling large audio files without loading them entirely into memory.
 
