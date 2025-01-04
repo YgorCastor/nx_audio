@@ -13,11 +13,12 @@ jobs:
   release-please:
     strategy:
       matrix:
-        elixir: ["1.17.3"]
+        elixir: ["1.18.1"]
         otp: ["27.2"]
     runs-on: ubuntu-latest
     steps:
       - name: "Prepare Release"
+        id: release
         uses: googleapis/release-please-action@v4
         with:
           release-type: elixir
