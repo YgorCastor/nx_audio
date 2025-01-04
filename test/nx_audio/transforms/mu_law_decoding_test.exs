@@ -36,7 +36,7 @@ defmodule NxAudio.Transforms.MuLawDecodingTest do
 
     test "encoding followed by decoding approximately recovers the original signal" do
       input = Nx.tensor([-0.9, -0.5, -0.1, 0.0, 0.1, 0.5, 0.9])
-      
+
       encoded = MuLawEncoding.transform(input)
       decoded = MuLawDecoding.transform(encoded)
 
