@@ -1,5 +1,6 @@
 defmodule NxAudio.Transforms.AmplitudeToDbTest do
-  use ExUnit.Case, async: true
+  use ExUnit.Case, async: false
+
   alias NxAudio.Transforms.AmplitudeToDb
 
   describe "transform/2" do
