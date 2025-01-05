@@ -12,8 +12,7 @@ defmodule NxAudio.IO do
   @type sample_rate() :: non_neg_integer()
 
   @typedoc """
-  A 2D tensor representing audio data. By default,
-  the first dimension is the amount of channels and the second dimension is the amount of samples.
+  A 2D tensor {channels, samples} representing audio data.
   """
   @type audio_tensor() :: Nx.Tensor.t()
 
@@ -68,6 +67,8 @@ defmodule NxAudio.IO do
     * `{:ok, {tensor, sample_rate}}` - On success, returns a tuple with the audio tensor and sample rate
     * `{:error, error}` - On failure, returns an error struct
   """
+  @spec load(file_uri(), BackendReadConfig.t()) ::
+          {:ok, {audio_tensor(), sample_rate()}} | {:error, io_errors()}
   def load(uri, config) do
     with {:ok, config} <- BackendReadConfig.validate(config),
          module <- which_backend(config) do
@@ -91,6 +92,7 @@ defmodule NxAudio.IO do
   ## Raises
     * Raises an error if the streaming operation fails
   """
+  @spec stream!(file_uri(), BackendReadConfig.t()) :: Enumerable.t()
   def stream!(uri, config) do
     with {:ok, config} <- BackendReadConfig.validate(config),
          module <- which_backend(config) do
@@ -110,6 +112,8 @@ defmodule NxAudio.IO do
     * `:ok` - On successful save
     * `{:error, error}` - On failure, returns an error struct
   """
+  @spec save(file_uri(), audio_tensor(), BackendSaveConfig.t()) ::
+          :ok | {:error, io_errors()}
   def save(uri, tensor, config) do
     with {:ok, config} <- BackendSaveConfig.validate(config),
          module <- which_backend(config) do
@@ -128,6 +132,8 @@ defmodule NxAudio.IO do
     * `{:ok, metadata}` - On success, returns the audio metadata (see `NxAudio.IO.AudioMetadata`)
     * `{:error, error}` - On failure, returns an error struct
   """
+  @spec info(file_uri(), BackendReadConfig.t()) ::
+          {:ok, NxAudio.IO.AudioMetadata.t()} | {:error, io_errors()}
   def info(uri, config) do
     with {:ok, config} <- BackendReadConfig.validate(config),
          module <- which_backend(config) do

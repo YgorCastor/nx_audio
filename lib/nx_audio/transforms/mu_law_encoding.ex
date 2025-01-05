@@ -44,6 +44,8 @@ defmodule NxAudio.Transforms.MuLawEncoding do
 
   import Nx.Defn
 
+  @behaviour NxAudio.Transforms
+
   @doc """
   Encodes an audio signal using mu-law encoding.
 
@@ -55,6 +57,9 @@ defmodule NxAudio.Transforms.MuLawEncoding do
       iex> tensor = Nx.tensor([0.5, -0.2, 0.1])
       iex> NxAudio.Transforms.MuLawEncoding.transform(tensor)
   """
+  @impl true
+  @spec transform(NxAudio.IO.audio_tensor(), keyword()) ::
+          NxAudio.IO.audio_tensor()
   defn transform(audio_tensor, opts \\ []) do
     opts = keyword!(opts, quantization_channels: 256)
     mu = opts[:quantization_channels] - 1

@@ -55,17 +55,22 @@ defmodule NxAudio.Transforms.MelSpectrogram do
 
   alias NxAudio.Transforms.Spectrogram
 
-  @doc """
-  Computes the mel-scaled spectrogram of an audio signal.
+  @behaviour NxAudio.Transforms
 
-  Args:
-    audio_tensor: Input audio tensor of shape [samples] or [channels, samples]
-    config: MelSpectrogram configuration options `NxAudio.Transforms.MelSpectrogramConfig`
+  @doc """
+  Computes the mel-scaled spectrogram of an audio signal.  
+
+  Args:  
+    audio_tensor: Input audio tensor of shape [samples] or [channels, samples]  
+    config: MelSpectrogram configuration options `NxAudio.Transforms.MelSpectrogramConfig`  
 
   Returns:
-    If input is [samples]: Returns tensor of shape [time, n_mels]
-    If input is [channels, samples]: Returns tensor of shape [channels, time, n_mels]
+    If input is [samples]: Returns tensor of shape [time, n_mels]  
+    If input is [channels, samples]: Returns tensor of shape [channels, time, n_mels]  
   """
+  @impl true
+  @spec transform(NxAudio.IO.audio_tensor(), NxAudio.Transforms.MelSpectrogramConfig.t()) ::
+          NxAudio.IO.audio_tensor()
   defn transform(audio_tensor, opts \\ []) do
     opts = validate(opts)
 

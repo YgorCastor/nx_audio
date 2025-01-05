@@ -40,11 +40,18 @@ defmodule NxAudio.Transforms.Resample do
   alias NxAudio.Commons.Windows
   alias NxAudio.Transforms.ResampleConfig
 
+  @behaviour NxAudio.Transforms
+
   @pi :math.pi()
 
   @doc """
-  Receives an audio tensor in the format {channels, samples} and resamples it to a new frequency.
+  Receives an audio tensor in the format {channels, samples} and resamples it to a new frequency.  
+
+  For options, check `NxAudio.Transforms.ResampleConfig`.
   """
+  @impl true
+  @spec transform(NxAudio.IO.audio_tensor(), ResampleConfig.t()) ::
+          NxAudio.IO.audio_tensor()
   def transform(audio_tensor, opts \\ []) do
     opts = ResampleConfig.validate!(opts)
     orig_freq = opts[:orig_freq]
