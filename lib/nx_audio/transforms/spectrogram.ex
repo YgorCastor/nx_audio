@@ -2,9 +2,12 @@ defmodule NxAudio.Transforms.Spectrogram do
   @moduledoc """
   Spectrogram transformation for audio tensors.
   """
+  @moduledoc section: :transforms
 
   import Nx.Defn
   import NxAudio.Transforms.SpectrogramConfig
+
+  @behaviour NxAudio.Transforms
 
   @doc """
   Computes the spectrogram of an audio signal.  
@@ -17,11 +20,13 @@ defmodule NxAudio.Transforms.Spectrogram do
     If input is [samples]: Returns tensor of shape [time, frequency]  
     If input is [channels, samples]: Returns tensor of shape [channels, time, frequency]  
 
-  Note:
-    Expected input format is {channels, time} for multi-channel audio
+  Note:  
+    Expected input format is {channels, time} for multi-channel audio  
   """
-  @moduledoc section: :transforms
 
+  @impl true
+  @spec transform(NxAudio.IO.audio_tensor(), NxAudio.Transforms.SpectrogramConfig.t()) ::
+          NxAudio.IO.audio_tensor()
   defn transform(audio_tensor, opts \\ []) do
     opts = validate(opts)
 

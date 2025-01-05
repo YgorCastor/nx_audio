@@ -32,6 +32,8 @@ defmodule NxAudio.Transforms.MuLawDecoding do
 
   import Nx.Defn
 
+  @behaviour NxAudio.Transforms
+
   @doc """
   Decodes a μ-law encoded audio signal back to its original form.
 
@@ -43,6 +45,9 @@ defmodule NxAudio.Transforms.MuLawDecoding do
       iex> encoded = Nx.tensor([0.8, -0.5, 0.3])
       iex> NxAudio.Transforms.MuLawDecoding.transform(encoded)
   """
+  @impl true
+  @spec transform(NxAudio.IO.audio_tensor(), keyword()) ::
+          NxAudio.IO.audio_tensor()
   defn transform(audio_tensor, opts \\ []) do
     opts = keyword!(opts, quantization_channels: 256)
     mu = opts[:quantization_channels] - 1

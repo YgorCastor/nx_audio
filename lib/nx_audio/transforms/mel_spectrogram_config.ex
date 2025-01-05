@@ -106,7 +106,7 @@ defmodule NxAudio.Transforms.MelSpectrogramConfig do
   import Nx.Defn
 
   @typedoc """
-  #{NimbleOptions.docs(@schema)}
+  #{NimbleOptions.docs(@schema)}  
   """
   @type t() :: [unquote(NimbleOptions.option_typespec(@schema))]
 
