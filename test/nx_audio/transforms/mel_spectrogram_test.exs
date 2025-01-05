@@ -1,5 +1,5 @@
 defmodule NxAudio.Transforms.MelSpectrogramTest do
-  use Nx.Case, async: true
+  use Nx.Case, async: false
 
   import NxAudio.Fixtures.AudioTensors
 

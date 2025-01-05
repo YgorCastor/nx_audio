@@ -1,5 +1,5 @@
 defmodule NxAudio.Transforms.MuLawEncodingTest do
-  use Nx.Case, async: true
+  use Nx.Case, async: false
 
   alias NxAudio.Transforms.MuLawEncoding
 
