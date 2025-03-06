@@ -97,7 +97,7 @@ defmodule NxAudio.Transforms.Resample do
           Windows.haan(window_length: kernel_size, periodic: false)
 
         :sinc_interp_kaiser ->
-          Windows.kaiser(window_length: kernel_size, beta: opts[:beta], periodic: false)
+          Windows.kaiser(kernel_size, beta: opts[:beta], is_periodic: false)
       end
 
     kernel = sinc * window * cutoff

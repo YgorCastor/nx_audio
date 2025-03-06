@@ -5,8 +5,9 @@ defmodule NxAudio.Commons.Windows do
   @moduledoc section: :common_utils
   import Nx.Defn
 
+  # TODO: Replace this with Nx.Signal once the Kaiser window is published
+
   @pi 3.141592653589793
-  @eps 2.220446049250313e-16
 
   @doc """
   Creates a Hann window of size `window_length`.  
@@ -44,66 +45,66 @@ defmodule NxAudio.Commons.Windows do
     end
   end
 
+  # INFO: I implemented this on NxSignal, but it is not published yet, remove once its published
+
   @doc """
   Creates a Kaiser window of size `window_length`.
 
   The Kaiser window is a taper formed by using a Bessel function.
 
-  Args:
-    window_length: Length of the window. Must be positive integer.
-    beta: Shape parameter for the window. As beta increases, the window becomes more focused in frequency domain.
-          When beta = 0, the window becomes rectangular. Defaults to 12.0.
-    periodic: If true, returns a periodic window for use with FFT. Defaults to true.
+  ## Options
 
-  Returns:
-    A 1-D tensor of size (window_length,) containing the window
-
-  ## Examples
-      iex> Windows.kaiser(window_length: 4, beta: 12.0)
-      #Nx.Tensor<
-        f32[4]
-        [0.0, 0.5, 0.5, 0.0]
-      >
+    * `:is_periodic` - If `true`, produces a periodic window,
+       otherwise produces a symmetric window. Defaults to `true`
+    * `:type` - the output type for the window. Defaults to `{:f, 32}`
+    * `:beta` - Shape parameter for the window. As beta increases, the window becomes more focused in frequency domain. Defaults to 12.0.
+    * `:eps` - Epsilon value to avoid division by zero. Defaults to 1.0e-7.
+    * `:axis_name` - the axis name. Defaults to `nil`
   """
-  defn kaiser(opts) do
-    opts = keyword!(opts, window_length: 1, beta: 12.0, periodic: true)
-    window_length = opts[:window_length]
+  deftransform kaiser(n, opts \\ []) when is_integer(n) do
+    opts =
+      Keyword.validate!(opts, [:name, eps: 1.0e-7, beta: 12.0, is_periodic: true, type: {:f, 32}])
+
+    kaiser_n(Keyword.put(opts, :n, n))
+  end
+
+  defnp kaiser_n(opts) do
+    n = opts[:n]
+    name = opts[:name]
+    type = opts[:type]
     beta = opts[:beta]
-    periodic = opts[:periodic]
+    eps = opts[:eps]
+    is_periodic = opts[:is_periodic]
 
-    computation_length = if periodic, do: window_length + 1, else: window_length
+    window_length = if is_periodic, do: n + 1, else: n
 
-    alpha = (computation_length - 1) / 2.0
+    ratio = Nx.linspace(-1, 1, n: window_length, endpoint: true, type: type, name: name)
+    sqrt_arg = Nx.max(1 - ratio ** 2, eps)
+    r = beta * Nx.sqrt(sqrt_arg)
 
-    n = Nx.iota({computation_length}, type: :f32)
-    ratio = (n - alpha) / alpha
-    r = beta * Nx.sqrt(1 - Nx.pow(ratio, 2) + @eps)
+    window = kaiser_bessel_i0(r) / kaiser_bessel_i0(beta)
 
-    # Calculate window values
-    window = _i0(r) / _i0(beta)
-
-    # If periodic, remove the last point
-    if periodic == 1 do
-      Nx.slice(window, [0], [window_length])
+    if is_periodic do
+      Nx.slice(window, [0], [n])
     else
       window
     end
   end
 
-  defnp _i0(x) do
-    terms = 50
+  defnp kaiser_bessel_i0(x) do
+    abs_x = Nx.abs(x)
 
-    n = Nx.iota({terms}, type: :f32)
-    seq = Nx.add(n, 1)
-    facts = Nx.cumulative_product(seq)
+    small_x_result =
+      1 +
+        abs_x ** 2 / 4 +
+        abs_x ** 4 / 64 +
+        abs_x ** 6 / 2304 +
+        abs_x ** 8 / 147_456
 
-    half_x = Nx.divide(x, 2)
-    half_x = Nx.reshape(half_x, {Nx.size(half_x), 1})
+    large_x_result =
+      Nx.exp(abs_x) / Nx.sqrt(2 * Nx.Constants.pi() * abs_x) *
+        (1 + 1 / (8 * abs_x) + 9 / (128 * Nx.pow(abs_x, 2)))
 
-    powers = Nx.pow(half_x, n)
-    terms = Nx.divide(powers, facts)
-    squared = Nx.multiply(terms, terms)
-
-    Nx.sum(squared, axes: [1])
+    Nx.select(abs_x < 3.75, small_x_result, large_x_result)
   end
 end
