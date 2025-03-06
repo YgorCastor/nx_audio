@@ -6,7 +6,7 @@ defmodule NxAudio.MixProject do
   def project do
     [
       app: :nx_audio,
-      version: "0.3.0",
+      version: "0.3.1",
       elixir: "~> 1.17",
       aliases: aliases(),
       description: description(),

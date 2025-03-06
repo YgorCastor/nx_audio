@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.1](https://github.com/YgorCastor/nx_audio/compare/v0.3.0...v0.3.1) (2025-03-06)
+
+
+### Bug Fixes
+
+* Fixed Kaiser Window function ([cad1868](https://github.com/YgorCastor/nx_audio/commit/cad186882af96b7f0c34b1ffb101f79dfa2227e8))
+
 ## [0.3.0](https://github.com/YgorCastor/nx_audio/compare/v0.2.0...v0.3.0) (2025-01-05)
 
 
