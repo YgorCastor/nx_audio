@@ -5,7 +5,7 @@ defmodule NxAudio.Commons.Windows do
   @moduledoc section: :common_utils
   import Nx.Defn
 
-  # TODO: Replace this with Nx.Signal once the Kaiser window is published
+  # INFO: Replace this with Nx.Signal once the Kaiser window is published
 
   @pi 3.141592653589793
 
