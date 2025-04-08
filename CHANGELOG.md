@@ -1,5 +1,27 @@
 # Changelog
 
+## 0.3.1 (2025-04-08)
+
+
+### Features
+
+* Added Resample transformation ([e665947](https://github.com/YgorCastor/nx_audio/commit/e665947ba3c12224a13df66511a902d5b6fd4d6f))
+* Added waveform visualization ([abcabc2](https://github.com/YgorCastor/nx_audio/commit/abcabc2dfc5da5592ec915b4e7554b8654151bbc))
+* Adds Kaiser window function ([d40407c](https://github.com/YgorCastor/nx_audio/commit/d40407ce45a58d56eec727cb22e55c6fdfd5f1f1))
+* Adds mu-law encoding and decoding transformations ([f32cc49](https://github.com/YgorCastor/nx_audio/commit/f32cc4912e8ca7fced8ca9417e6e36f998c38d18))
+* Adds support to streams ([e54a25e](https://github.com/YgorCastor/nx_audio/commit/e54a25ed2160d08dcfbf392045258afbb8fd0a3b))
+* Initial Release ([902e2c3](https://github.com/YgorCastor/nx_audio/commit/902e2c31589e69c42207e9145ecd3743f594e883))
+
+
+### Bug Fixes
+
+* Fixed Kaiser Window function ([4be9df6](https://github.com/YgorCastor/nx_audio/commit/4be9df672ceb66ff883899b327a59323fe5349a2))
+
+
+### Miscellaneous Chores
+
+* Fixed versioning, release please broke again ([16c5ce2](https://github.com/YgorCastor/nx_audio/commit/16c5ce2f0f86fabb56afa5f24b04300d315af79e))
+
 ## [0.3.0](https://github.com/YgorCastor/nx_audio/compare/v0.2.0...v0.3.0) (2025-01-05)
 
 
